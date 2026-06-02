@@ -118,6 +118,22 @@
   .no-results p{margin-top:16px;font-size:19px;color:var(--muted);line-height:1.4;}
   @keyframes popIn{0%{transform:scale(.85);opacity:0;}100%{transform:scale(1);opacity:1;}}
 
+  /* resaltado al encontrar texto fuera de las publicaciones */
+  .found-highlight{
+    text-decoration:underline;
+    text-decoration-color:#2997ff;
+    text-decoration-thickness:3px;
+    text-underline-offset:4px;
+    background:rgba(41,151,255,.18);
+    border-radius:4px;
+    padding:0 2px;
+    animation:foundFlash 1.8s ease;
+  }
+  @keyframes foundFlash{
+    0%{background:rgba(41,151,255,.55);}
+    100%{background:rgba(41,151,255,.18);}
+  }
+
   /* ---------- HERO ---------- */
   .hero{
     background:#000;
@@ -696,12 +712,52 @@
   }
   function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
-  // resalta las coincidencias en el texto
+  // resalta las coincidencias dentro de los resultados de publicaciones
   function highlight(text, q){
     const safe = escapeHTML(text);
     if(!q) return safe;
     const re = new RegExp('('+escapeReg(escapeHTML(q))+')','ig');
     return safe.replace(re,'<mark>$1</mark>');
+  }
+
+  // ----- helpers para resaltar texto en cualquier parte de la página -----
+  function clearHighlights(){
+    document.querySelectorAll('.found-highlight').forEach(s => {
+      const parent = s.parentNode;
+      parent.replaceChild(document.createTextNode(s.textContent), s);
+      parent.normalize();
+    });
+  }
+
+  // busca el primer nodo de texto de la página (fuera del buscador) que contenga q
+  function findOnPage(q){
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        const p = node.parentElement;
+        if(!p) return NodeFilter.FILTER_REJECT;
+        if(p.closest('script,style,#searchView,.search')) return NodeFilter.FILTER_REJECT;
+        return node.nodeValue.toLowerCase().includes(q)
+          ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    return walker.nextNode();
+  }
+
+  // envuelve la coincidencia en un <span> subrayado y lo devuelve
+  function highlightNode(textNode, q){
+    const text = textNode.nodeValue;
+    const idx = text.toLowerCase().indexOf(q);
+    if(idx < 0) return null;
+    const span = document.createElement('span');
+    span.className = 'found-highlight';
+    span.textContent = text.slice(idx, idx + q.length);
+    const frag = document.createDocumentFragment();
+    if(idx > 0) frag.appendChild(document.createTextNode(text.slice(0, idx)));
+    frag.appendChild(span);
+    if(idx + q.length < text.length) frag.appendChild(document.createTextNode(text.slice(idx + q.length)));
+    textNode.parentNode.replaceChild(frag, textNode);
+    return span;
   }
 
   function runSearch(){
@@ -711,41 +767,57 @@
     if(!q){
       document.body.classList.remove('searching');
       view.innerHTML = '';
+      clearHighlights();
       return;
     }
 
+    clearHighlights();
     document.body.classList.add('searching');
 
-    // coincide si el titular (o el eyebrow) contiene el texto buscado
+    // 1) buscar entre las publicaciones
     const matches = pubs.filter(p =>
       p.title.toLowerCase().includes(q) || p.eyebrow.toLowerCase().includes(q)
     );
 
-    if(matches.length === 0){
-      view.innerHTML =
-        '<div class="no-results">'+
-          '<h2>No Eres Tú, soy Yo</h2>'+
-          '<p>Ohhh, no pudimos encontrar esa publicación.<br>Tranquilo, no es tu culpa.</p>'+
-        '</div>';
+    if(matches.length > 0){
+      let html = '<div class="results-head">'+matches.length+
+        (matches.length===1?' resultado para ':' resultados para ')+
+        '<b>“'+escapeHTML(qRaw)+'”</b></div>';
+      matches.forEach(p => {
+        html +=
+          '<article class="result">'+
+            (p.thumb ? '<div class="r-thumb">'+p.thumb+'</div>' : '')+
+            '<div class="info">'+
+              (p.eyebrow ? '<div class="eyebrow">'+escapeHTML(p.eyebrow)+'</div>' : '')+
+              '<h3 class="headline">'+highlight(p.title, qRaw)+'</h3>'+
+              (p.date ? '<div class="date">'+escapeHTML(p.date)+'</div>' : '')+
+            '</div>'+
+          '</article>';
+      });
+      view.innerHTML = html;
       return;
     }
 
-    let html = '<div class="results-head">'+matches.length+
-      (matches.length===1?' resultado para ':' resultados para ')+
-      '<b>“'+escapeHTML(qRaw)+'”</b></div>';
+    // 2) no hay publicación: buscar en el resto de la página
+    const node = findOnPage(q);
+    if(node){
+      document.body.classList.remove('searching');
+      view.innerHTML = '';
+      input.value = '';
+      input.blur();
+      const span = highlightNode(node, q);
+      if(span){
+        setTimeout(() => span.scrollIntoView({behavior:'smooth', block:'center'}), 50);
+      }
+      return;
+    }
 
-    matches.forEach(p => {
-      html +=
-        '<article class="result">'+
-          (p.thumb ? '<div class="r-thumb">'+p.thumb+'</div>' : '')+
-          '<div class="info">'+
-            (p.eyebrow ? '<div class="eyebrow">'+escapeHTML(p.eyebrow)+'</div>' : '')+
-            '<h3 class="headline">'+highlight(p.title, qRaw)+'</h3>'+
-            (p.date ? '<div class="date">'+escapeHTML(p.date)+'</div>' : '')+
-          '</div>'+
-        '</article>';
-    });
-    view.innerHTML = html;
+    // 3) no está en ningún lado
+    view.innerHTML =
+      '<div class="no-results">'+
+        '<h2>No Eres Tú, soy Yo</h2>'+
+        '<p>Ohhh, no pudimos encontrar esa publicación.<br>Tranquilo, no es tu culpa.</p>'+
+      '</div>';
   }
 
   input.addEventListener('input', runSearch);
