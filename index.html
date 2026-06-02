@@ -79,7 +79,44 @@
     transition:background .2s;
   }
   .search:hover{background:rgba(255,255,255,0.16);}
-  .search svg{width:13px;height:13px;opacity:.85;}
+  .search svg{width:13px;height:13px;opacity:.85;flex:0 0 auto;}
+  .search input{
+    background:transparent;border:none;outline:none;
+    color:#fff;font-family:inherit;font-size:14px;width:150px;
+  }
+  .search input::placeholder{color:#cfcfd2;}
+
+  /* ---------- BUSCADOR: vista de resultados ---------- */
+  #searchView{display:none;padding:46px 0 60px;}
+  body.searching .wrap > :not(#searchView){display:none;}
+  body.searching #searchView{display:block;}
+
+  .results-head{font-size:21px;color:var(--muted);margin-bottom:26px;}
+  .results-head b{color:var(--text);font-weight:700;}
+  .result{
+    display:flex;align-items:center;gap:22px;
+    padding:22px 0;border-bottom:1px solid rgba(255,255,255,0.10);
+    cursor:default;
+  }
+  .result .r-thumb{
+    flex:0 0 120px;height:80px;border-radius:14px;overflow:hidden;background:#1c1c1e;
+  }
+  .result .r-thumb img,.result .r-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
+  .result .eyebrow{margin-bottom:8px;}
+  .result .headline{font-size:20px;line-height:1.2;}
+  .result .date{margin-top:8px;padding-top:0;}
+  mark{background:rgba(41,151,255,.35);color:inherit;border-radius:3px;}
+
+  /* mensaje sin resultados */
+  .no-results{text-align:center;padding:70px 20px;}
+  .no-results h2{
+    font-size:48px;font-weight:700;letter-spacing:-0.02em;
+    background:linear-gradient(120deg,#fff,#a1a1a6);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:popIn .5s cubic-bezier(.22,1,.36,1);
+  }
+  .no-results p{margin-top:16px;font-size:19px;color:var(--muted);line-height:1.4;}
+  @keyframes popIn{0%{transform:scale(.85);opacity:0;}100%{transform:scale(1);opacity:1;}}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -347,7 +384,7 @@
     padding:40px max(22px,calc((100% - 1180px)/2));
     color:var(--muted);font-size:12px;line-height:1.6;
   }
-  footer .legal{margin-top:18px;border-top:1px solid rgba(255,255,255,0.10);padding-top:18px;}
+  footer .legal{color:var(--muted);}
 
   /* responsivo */
   @media(max-width:820px){
@@ -378,15 +415,15 @@
   <header>
     <div class="brand">Newsroom</div>
     <nav>
-      <a class="link" href="#">Servicios de WTC</a>
-      <a class="link" href="#">WTC Stories</a>
-      <div class="search">
+      <a class="link" href="#">Servicios de Apple</a>
+      <a class="link" href="#">Apple Stories</a>
+      <label class="search">
         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="6.8" cy="6.8" r="5.2" stroke="currentColor" stroke-width="1.4"/>
           <line x1="10.7" y1="10.7" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
-        Buscar Newsroom
-      </div>
+        <input id="searchInput" type="text" placeholder="Buscar Newsroom" autocomplete="off">
+      </label>
     </nav>
   </header>
 
@@ -395,6 +432,8 @@
   </section>
 
   <main class="wrap">
+
+    <div id="searchView"></div>
 
     <div class="top-row">
       <div>
@@ -440,7 +479,7 @@
              alt="Swift Student Challenge" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
       <div class="text">
-        <div class="eyebrow">WTC Stories</div>
+        <div class="eyebrow">Apple Stories</div>
         <h2 class="headline">Este año, la IA se une a la accesibilidad en el Swift Student Challenge</h2>
         <div class="date">07 de mayo de 2026</div>
       </div>
@@ -451,7 +490,7 @@
     <article class="overlay-card">
       <img src="https://www.apple.com/newsroom/images/2026/05/cherokee-language-learners-bridge-generations-with-ipad-and-mac/tile/Apple-Cherokee-Nation-education-partnership-Erlinda-Soap-5th-grade-classroom-lp.jpg.landing-big_2x.jpg" alt="Estudiantes de cheroqui">
       <div class="text">
-        <div class="eyebrow">WTC Stories</div>
+        <div class="eyebrow">Apple Stories</div>
         <h2 class="headline">Estudiantes de cheroqui tienden puentes entre generaciones con el iPad y la Mac</h2>
         <div class="date">28 de mayo de 2026</div>
       </div>
@@ -463,14 +502,14 @@
       <article class="grid-card">
         <div class="thumb"><img src="https://www.apple.com/newsroom/images/2026/05/apple-tv-to-air-first-major-live-pro-sports-event-shot-on-iphone-17-pro/tile/Apple-TV-MLS-logo-lockup.jpg.landing-big_2x.jpg" alt="Apple TV MLS"></div>
         <div class="eyebrow">Lectura rápida</div>
-        <h3 class="headline">WTC TV transmitirá un partido de la MLS grabado completamente con un iPhone</h3>
+        <h3 class="headline">Apple TV transmitirá un partido de la MLS grabado completamente con un iPhone</h3>
         <div class="date">21 de mayo de 2026</div>
       </article>
 
       <article class="grid-card">
         <div class="thumb"><img src="https://www.apple.com/newsroom/images/2026/05/apple-sports-expands-to-more-than-90-new-countries-and-regions/tile/Apple-Sports-updates-lp.jpg.landing-big_2x.jpg" alt="Apple Sports"></div>
         <div class="eyebrow">Actualización</div>
-        <h3 class="headline">WTC Sports se expande a más de 90 nuevos países y regiones</h3>
+        <h3 class="headline">Apple Sports se expande a más de 90 nuevos países y regiones</h3>
         <div class="date">19 de mayo de 2026</div>
       </article>
 
@@ -484,7 +523,7 @@
       <article class="grid-card">
         <div class="thumb"><video src="https://www.apple.com/newsroom/videos/2026/animated-tiles/05/apple-arcade-june-updates/regular/large_2x.mp4" autoplay muted loop playsinline></video></div>
         <div class="eyebrow">Actualización</div>
-        <h3 class="headline">¡Genial! Bluey te invita a jugar en WTC Arcade a partir del 21 de mayo</h3>
+        <h3 class="headline">¡Genial! Bluey te invita a jugar en Apple Arcade a partir del 21 de mayo</h3>
         <div class="date">12 de mayo de 2026</div>
       </article>
 
@@ -559,7 +598,7 @@
         <div class="thumb"><img src="https://www.apple.com/newsroom/images/2026/03/introducing-apple-business-a-new-all-in-one-platform-for-businesses-of-all-sizes/tile/Apple-Business-hero-lp.jpg.landing-1by1_2x.jpg" alt="Apple Business"></div>
         <div class="info">
           <div class="eyebrow">Actualización</div>
-          <h3 class="headline">Presentamos WTC Business</h3>
+          <h3 class="headline">Presentamos Apple Business</h3>
           <div class="date">24 de marzo de 2026</div>
         </div>
       </article>
@@ -579,7 +618,6 @@
   </main>
 
   <footer>
-    Más formas de comprar: Busca un WTC Store o un distribuidor cerca de ti. O llama al 001-800-692-7753.
     <div class="legal">
       Copyright © 2026 WTC Inc. Todos los derechos reservados. &nbsp;·&nbsp; Política de privacidad &nbsp;·&nbsp; Ventas y reembolsos &nbsp;·&nbsp; Aviso legal &nbsp;·&nbsp; Mapa del sitio &nbsp;·&nbsp; México
     </div>
@@ -626,6 +664,95 @@
   tick();
   // recalcula cada segundo (el cambio visible será al cambiar el minuto)
   setInterval(tick, 1000);
+
+  /* ---------- BUSCADOR ---------- */
+  // Recolectar todas las publicaciones de la página (cualquier artículo con titular)
+  const pubs = [];
+  document.querySelectorAll('article').forEach(art => {
+    const h = art.querySelector('.headline');
+    if(!h) return;
+    const eyebrow = art.querySelector('.eyebrow');
+    const date = art.querySelector('.date');
+    // clonar la miniatura/medios para mostrarla en resultados
+    const mediaEl = art.querySelector('.thumb, .media');
+    let thumbHTML = '';
+    if(mediaEl){
+      const inner = mediaEl.querySelector('img, video');
+      if(inner) thumbHTML = inner.outerHTML;
+    }
+    pubs.push({
+      title: h.textContent.trim(),
+      eyebrow: eyebrow ? eyebrow.textContent.trim() : '',
+      date: date ? date.textContent.trim() : '',
+      thumb: thumbHTML
+    });
+  });
+
+  const input = document.getElementById('searchInput');
+  const view = document.getElementById('searchView');
+
+  function escapeHTML(s){
+    return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+  function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+  // resalta las coincidencias en el texto
+  function highlight(text, q){
+    const safe = escapeHTML(text);
+    if(!q) return safe;
+    const re = new RegExp('('+escapeReg(escapeHTML(q))+')','ig');
+    return safe.replace(re,'<mark>$1</mark>');
+  }
+
+  function runSearch(){
+    const qRaw = input.value.trim();
+    const q = qRaw.toLowerCase();
+
+    if(!q){
+      document.body.classList.remove('searching');
+      view.innerHTML = '';
+      return;
+    }
+
+    document.body.classList.add('searching');
+
+    // coincide si el titular (o el eyebrow) contiene el texto buscado
+    const matches = pubs.filter(p =>
+      p.title.toLowerCase().includes(q) || p.eyebrow.toLowerCase().includes(q)
+    );
+
+    if(matches.length === 0){
+      view.innerHTML =
+        '<div class="no-results">'+
+          '<h2>No Eres Tú, soy Yo</h2>'+
+          '<p>Ohhh, no pudimos encontrar esa publicación.<br>Tranquilo, no es tu culpa.</p>'+
+        '</div>';
+      return;
+    }
+
+    let html = '<div class="results-head">'+matches.length+
+      (matches.length===1?' resultado para ':' resultados para ')+
+      '<b>“'+escapeHTML(qRaw)+'”</b></div>';
+
+    matches.forEach(p => {
+      html +=
+        '<article class="result">'+
+          (p.thumb ? '<div class="r-thumb">'+p.thumb+'</div>' : '')+
+          '<div class="info">'+
+            (p.eyebrow ? '<div class="eyebrow">'+escapeHTML(p.eyebrow)+'</div>' : '')+
+            '<h3 class="headline">'+highlight(p.title, qRaw)+'</h3>'+
+            (p.date ? '<div class="date">'+escapeHTML(p.date)+'</div>' : '')+
+          '</div>'+
+        '</article>';
+    });
+    view.innerHTML = html;
+  }
+
+  input.addEventListener('input', runSearch);
+  // Escape limpia la búsqueda
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ input.value = ''; runSearch(); input.blur(); }
+  });
 </script>
 </body>
 </html>
